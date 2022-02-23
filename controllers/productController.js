@@ -20,6 +20,24 @@ exports.getAllProducts = async (req, res) => {
   });
 };
 
+// Get Single Product
+exports.getProductDetails = async (req, res, next) => {
+  const product = await Product.findById(req.params.id);
+
+  //If product is not  found
+  if (!product) {
+    return res.status(500).json({
+      success: false,
+      message: "product not found",
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    product,
+  });
+};
+
 exports.updateProduct = async (req, res, next) => {
   let product = await Product.findById(req.params.id);
 
@@ -52,8 +70,8 @@ exports.deleteProduct = async (req, res, next) => {
   //If product is not  found
   if (!product) {
     return res.status(500).json({
-        success:false,
-        message:"product not found"
+      success: false,
+      message: "product not found",
     });
   }
 
