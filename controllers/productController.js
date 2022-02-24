@@ -45,7 +45,6 @@ exports.getProductDetails = catchAsyncError(async (req, res, next) => {
   res.status(200).json({
     success: true,
     product,
-  
   });
 });
 
@@ -85,5 +84,50 @@ exports.deleteProduct = catchAsyncError(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Product Deleted successfully",
+  });
+});
+
+// Create New Review or Update the review
+exports.createProductReview = catchAsyncError(async (req, res, next) => {
+  const { rating, comment, productId } = req.body;
+
+  console.log(rating,comment,productId);
+  const review = {
+    user: req.user._id,
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+  };
+
+  const product = await Product.findById(productId);
+
+  //Check the review is given by login User
+  const isReviewed = product.reviews.find(
+    (rev) => rev.user.toString() === req.user._id.toString()
+  );
+
+  //Update the exiting Review and comment
+  if (isReviewed) {
+    product.reviews.forEach((rev) => {
+      if (rev.user.toString() === req.user._id.toString())
+        (rev.rating = rating), (rev.comment = comment);
+    });
+  } else {
+    product.reviews.push(review);// if reviews does not exit for the user push it into array
+    product.numOfReviews = product.reviews.length; // total review of product
+  }
+
+  let avg = 0;
+// Total avg of Product review
+  product.reviews.forEach((rev) => {
+    avg += rev.rating;
+  });
+// update the overall rating of Product
+  product.ratings = avg / product.reviews.length;
+
+  await product.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
   });
 });
