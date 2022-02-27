@@ -13,7 +13,7 @@ const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.route("/product").get(getAllProducts);
+router.route("/products").get(getAllProducts);
 
 router.route("/product/:id").get(getProductDetails);
 
